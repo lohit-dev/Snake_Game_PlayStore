@@ -20,7 +20,6 @@ import com.king_grey.retro_snake.ui.theme.DarkGreen
 
 @Composable
 fun OnBoardingScreen(navController: NavHostController) {
-
     Surface(
         color = DarkGreen, modifier = Modifier.fillMaxSize()
     ) {

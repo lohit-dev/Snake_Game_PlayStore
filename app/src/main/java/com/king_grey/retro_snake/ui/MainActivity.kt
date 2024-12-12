@@ -13,7 +13,6 @@ import com.king_grey.retro_snake.ui.navigation.SetUpNavigation
 import com.king_grey.retro_snake.ui.theme.SnakeGameTheme
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
