@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.king_grey.retro_snake"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.king_grey.retro_snake"

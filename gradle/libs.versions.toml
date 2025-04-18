@@ -1,9 +1,9 @@
 [versions]
-agp = "8.7.3"
+agp = "8.9.1"
 coilCompose = "3.0.0-rc01"
 coreSplashscreen = "1.0.1"
-kotlin = "2.0.0"
-coreKtx = "1.15.0"
+kotlin = "2.0.21"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
