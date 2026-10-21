@@ -21,7 +21,7 @@ import com.king_grey.retro_snake.ui.components.PixelText
 import com.king_grey.retro_snake.ui.components.TriangleIcon
 import com.king_grey.retro_snake.ui.theme.LocalRetro
 
-/** Screen title with the dashed rule that fills the rest of the row. */
+/** Screen title with the dashed rule that fills the rest with the row. */
 @Composable
 fun ScreenTitle(text: String, size: Int = 20, trailing: @Composable () -> Unit = {}) {
     val c = LocalRetro.current
