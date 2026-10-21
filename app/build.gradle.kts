@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.king_grey.retro_snake"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.king_grey.retro_snake"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.5"
+        versionCode = 5
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,19 +27,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+
     buildFeatures {
         compose = true
     }
 }
 
-dependencies {
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
 
+dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -60,7 +63,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     // Navigation
     implementation(libs.androidx.navigation.compose)
-    // Coil
-    implementation(libs.coil.svg)
-    implementation(libs.coil.compose)
+    // ViewModel + lifecycle helpers for Compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }
