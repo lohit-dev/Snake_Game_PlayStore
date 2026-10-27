@@ -95,9 +95,10 @@ fun MenuScreen(
     RetroScreen {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val compact = maxHeight < 720.dp
+            val boxMaxHeight = maxHeight
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Column(
-                Modifier.fillMaxWidth().defaultMinSize(minHeight = maxHeight).padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 20.dp),
+                Modifier.fillMaxWidth().defaultMinSize(minHeight = boxMaxHeight).padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 20.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
               Column {

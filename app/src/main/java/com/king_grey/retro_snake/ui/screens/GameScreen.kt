@@ -434,10 +434,11 @@ private fun GameOverContent(r: RunResult, vm: GameViewModel, onAgain: () -> Unit
     val c = LocalRetro.current
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
     BoxWithConstraints(Modifier.fillMaxHeight().widthIn(max = 520.dp).fillMaxWidth()) {
+        val boxMaxHeight = maxHeight
     // Scrolls on short windows; otherwise the buttons stay pinned to the bottom.
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
     Column(
-        Modifier.fillMaxWidth().defaultMinSize(minHeight = maxHeight).padding(24.dp),
+        Modifier.fillMaxWidth().defaultMinSize(minHeight = boxMaxHeight).padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
