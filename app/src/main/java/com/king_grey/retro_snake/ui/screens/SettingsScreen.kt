@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -120,7 +121,7 @@ fun SettingsScreen(vm: GameViewModel, onBack: () -> Unit) {
                     .padding(24.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                PixelPanel(Modifier.fillMaxWidth().semantics { paneTitle = "Reset all stats" }) {
+                PixelPanel(Modifier.widthIn(max = 440.dp).fillMaxWidth().semantics { paneTitle = "Reset all stats" }) {
                     Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         PixelText("RESET STATS?", 16, c.danger)
                         MonoText("This clears your high scores, totals and recent runs. It can't be undone.", 13, c.muted, align = androidx.compose.ui.text.style.TextAlign.Center)

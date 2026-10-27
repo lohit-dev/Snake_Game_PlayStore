@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -92,9 +95,12 @@ fun MenuScreen(
     RetroScreen {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val compact = maxHeight < 720.dp
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Column(
-                Modifier.fillMaxSize().padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 20.dp),
+                Modifier.fillMaxWidth().defaultMinSize(minHeight = maxHeight).padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
+              Column {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         PixelText("HI-SCORE", 10, c.muted, letterSpacing = 1.2f)
@@ -162,14 +168,15 @@ fun MenuScreen(
                     ) { ArrowIcon(Direction.RIGHT, c.text, 20.dp) }
                 }
 
-                Spacer(Modifier.weight(1f))
+              }
 
-                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     MenuButton("PLAY", 72.dp, 22, primary = true, selected = sel == 0, onActive = { sel = 0 }, onClick = onPlay)
                     MenuButton("STATS", 56.dp, 16, primary = false, selected = sel == 1, onActive = { sel = 1 }, onClick = onStats)
                     MenuButton("SETTINGS", 56.dp, 16, primary = false, selected = sel == 2, onActive = { sel = 2 }, onClick = onSettings)
                     MenuButton("HOW TO PLAY", 56.dp, 16, primary = false, selected = sel == 3, onActive = { sel = 3 }, onClick = onHelp)
                 }
+            }
             }
         }
     }

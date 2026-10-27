@@ -41,7 +41,13 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import androidx.lifecycle.Lifecycle
@@ -123,7 +129,7 @@ fun GameScreen(vm: GameViewModel, onExit: () -> Unit, onStats: () -> Unit) {
         }
     }
 
-    RetroScreen {
+    RetroScreen(maxContentWidth = Dp.Infinity) {
         if (result != null) {
             GameOverContent(result, vm, onAgain = { vm.startNewGame() }, onMenu = onExit, onStats = onStats)
         } else {
@@ -183,23 +189,76 @@ private fun PlayContent(vm: GameViewModel, controls: ControlMode) {
         val byHeight = ((maxHeight - hud - pad - frame) / BOARD_H).value
         val cell = minOf(byWidth, byHeight).toInt().coerceAtLeast(8)
 
-        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Hud(vm)
-            Box(contentAlignment = Alignment.Center) {
-                PixelPanel(fill = c.bg) {
-                    Box(Modifier.padding(4.dp)) { Board(vm, cell) }
-                }
-                if (vm.countdown > 0) {
-                    ExtrudedText(vm.countdown.toString(), 72, c.accent, c.accentDark, c.shadow, step = 4.dp)
+        if (maxWidth > maxHeight) {
+            // Landscape (tablets, foldables, split screen): board on the left, controls on the right.
+            val cellL = ((maxHeight - 28.dp - frame) / BOARD_H).value.toInt().coerceAtLeast(8)
+            Row(
+                Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(28.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                BoardWithCountdown(vm, cellL)
+                Column(
+                    Modifier.width(272.dp).verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    HudStacked(vm)
+                    if (showPad) DPad(onPress = vm::onDirection)
+                    else MonoText("Swipe anywhere to turn", 13, c.muted)
                 }
             }
-            Spacer(Modifier.weight(1f))
-            if (showPad) {
-                DPad(onPress = vm::onDirection)
-                Spacer(Modifier.height(12.dp))
-            } else {
-                MonoText("Swipe anywhere to turn", 13, c.muted, Modifier.padding(bottom = 20.dp))
+        } else {
+            Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Hud(vm)
+                BoardWithCountdown(vm, cell)
+                Spacer(Modifier.weight(1f))
+                if (showPad) {
+                    DPad(onPress = vm::onDirection)
+                    Spacer(Modifier.height(12.dp))
+                } else {
+                    MonoText("Swipe anywhere to turn", 13, c.muted, Modifier.padding(bottom = 20.dp))
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun BoardWithCountdown(vm: GameViewModel, cell: Int) {
+    val c = LocalRetro.current
+    Box(contentAlignment = Alignment.Center) {
+        PixelPanel(fill = c.bg) {
+            Box(Modifier.padding(4.dp)) { Board(vm, cell) }
+        }
+        if (vm.countdown > 0) {
+            ExtrudedText(vm.countdown.toString(), 72, c.accent, c.accentDark, c.shadow, step = 4.dp)
+        }
+    }
+}
+
+@Composable
+private fun ScorePanel(vm: GameViewModel) {
+    val c = LocalRetro.current
+    PixelPanel(fill = c.deep) {
+        Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            MonoText("SCORE", 11, c.muted, letterSpacing = 1.8f, lineHeight = 14)
+            LcdDigits(vm.state.apples, 22, c.data)
+        }
+    }
+}
+
+@Composable
+private fun HudStacked(vm: GameViewModel) {
+    val c = LocalRetro.current
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            PixelButton(onClick = { vm.pause() }, modifier = Modifier.width(56.dp), height = 56.dp, description = "Pause") { PauseIcon(c.text) }
+            ScorePanel(vm)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+            HudStat("HI ", maxOf(vm.currentBest, vm.state.apples).toString().padStart(3, '0'), c.accent)
+            HudStat("SPD ", vm.activeDifficultyValue.levelFor(vm.state.apples).toString(), c.text)
         }
     }
 }
@@ -220,12 +279,7 @@ private fun Hud(vm: GameViewModel) {
                 description = "Pause",
             ) { PauseIcon(c.text) }
         }
-        PixelPanel(fill = c.deep) {
-            Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MonoText("SCORE", 11, c.muted, letterSpacing = 1.8f, lineHeight = 14)
-                LcdDigits(vm.state.apples, 22, c.data)
-            }
-        }
+        ScorePanel(vm)
         Column(Modifier.width(84.dp), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(10.dp)) {
             HudStat("HI ", maxOf(vm.currentBest, vm.state.apples).toString().padStart(3, '0'), c.accent)
             HudStat("SPD ", vm.activeDifficultyValue.levelFor(vm.state.apples).toString(), c.text)
@@ -344,7 +398,8 @@ private fun PauseOverlay(vm: GameViewModel, onResume: () -> Unit, onRestart: () 
             .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        PixelPanel(Modifier.fillMaxWidth().semantics { paneTitle = "Paused" }) {
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        PixelPanel(Modifier.widthIn(max = 440.dp).fillMaxWidth().semantics { paneTitle = "Paused" }) {
             Column(Modifier.padding(start = 22.dp, end = 22.dp, top = 28.dp, bottom = 26.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(Modifier.blinking()) {
                     ExtrudedText("PAUSED", 26, c.text, c.accentDark, null, step = 3.dp)
@@ -370,15 +425,23 @@ private fun PauseOverlay(vm: GameViewModel, onResume: () -> Unit, onRestart: () 
                 }
             }
         }
+        }
     }
 }
 
 @Composable
 private fun GameOverContent(r: RunResult, vm: GameViewModel, onAgain: () -> Unit, onMenu: () -> Unit, onStats: () -> Unit) {
     val c = LocalRetro.current
-    Column(Modifier.fillMaxSize().padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 24.dp)) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    BoxWithConstraints(Modifier.fillMaxHeight().widthIn(max = 520.dp).fillMaxWidth()) {
+    // Scrolls on short windows; otherwise the buttons stay pinned to the bottom.
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(
+        Modifier.fillMaxWidth().defaultMinSize(minHeight = maxHeight).padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
         Column(
-            Modifier.weight(1f).fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
@@ -406,7 +469,7 @@ private fun GameOverContent(r: RunResult, vm: GameViewModel, onAgain: () -> Unit
                 StatTile("TOP SPEED", r.record.topSpeed.toString(), Modifier.weight(1f))
             }
         }
-        Column(verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.padding(top = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             PixelButton(onClick = onAgain, modifier = Modifier.fillMaxWidth(), height = 72.dp, border = c.accentDark, face = c.accent) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     TriangleIcon(true, c.onAccent, 16.dp, 20.dp)
@@ -430,6 +493,9 @@ private fun GameOverContent(r: RunResult, vm: GameViewModel, onAgain: () -> Unit
                 )
             }
         }
+    }
+    }
+    }
     }
 }
 

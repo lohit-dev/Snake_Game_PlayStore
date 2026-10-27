@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -202,11 +204,14 @@ fun CrtOverlay() {
 
 /** Full-screen retro backdrop: palette colour, dot grid, safe-area padding and optional CRT overlay. */
 @Composable
-fun RetroScreen(content: @Composable BoxScope.() -> Unit) {
+fun RetroScreen(maxContentWidth: Dp = 520.dp, content: @Composable BoxScope.() -> Unit) {
     val c = LocalRetro.current
     val s = LocalSettings.current
-    Box(Modifier.fillMaxSize().background(c.bg).dotGrid(c.dots, s.grid)) {
-        Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing), content = content)
+    Box(Modifier.fillMaxSize().background(c.bg).dotGrid(c.dots, s.grid), contentAlignment = Alignment.TopCenter) {
+        Box(
+            Modifier.fillMaxHeight().widthIn(max = maxContentWidth).fillMaxWidth().windowInsetsPadding(WindowInsets.safeDrawing),
+            content = content,
+        )
         if (s.crt) CrtOverlay()
     }
 }
